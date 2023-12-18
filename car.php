@@ -8,12 +8,6 @@ if (!isset($_SESSION['email'])) {
     header("Location: login.php");
     exit();
 }
-?>
-
-
-
-<?php
-session_start();
 
 // Logout Process
 if (isset($_GET['logout'])) {

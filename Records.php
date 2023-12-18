@@ -1,8 +1,7 @@
 <?php
-// Start the session
+
 session_start();
 require_once 'dbcon.php';
-
 // Logout Process
 if (isset($_GET['logout'])) {
     session_destroy();
@@ -16,6 +15,14 @@ if (!isset($_SESSION['email'])) {
     header("Location: AdminLogin.php");
     exit();
 }
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}   
+$sql = "SELECT * FROM cars";
+$result = $conn->query($sql);
+
+$conn->close();
 ?>
 
 
@@ -75,66 +82,69 @@ if (!isset($_SESSION['email'])) {
       <div class="container">
         <div class="row no-gutters slider-text js-fullheight align-items-end justify-content-start">
           <div class="col-md-9 ftco-animate pb-5">
-          	<p class="breadcrumbs"><span class="mr-2"><a href="index.php">Addcar <i class="ion-ios-arrow-forward"></i></a></span> <span>Car details <i class="ion-ios-arrow-forward"></i></span></p>
+          	<p class="breadcrumbs"><span class="mr-2"><a href="index.php">Addcar <i class="ion-ios-arrow-forward"></i></a></span> <span>Records <i class="ion-ios-arrow-forward"></i></span></p>
             <h1 class="mb-3 bread">Add Car</h1>
           </div>
         </div>
       </div>
     </section>
 
+    <div class="container mt-5">
+    <table class="table table-bordered">
+        <thead class="thead-dark">
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Mileage</th>
+                <th>Transmission</th>
+                <th>Seats</th>
+                <th>Luggage</th>
+                <th>Fuel</th>
+                <th>Description</th>
+                <th>Price</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+            // Check if there are records
+            if ($result->num_rows > 0) {
+                // Output data for each row
+                while ($row = $result->fetch_assoc()) {
+                    echo "<tr>";
+                    echo "<td class='text-center'>" . $row['id'] . "</td>";
+                    echo "<td class='text-center'>" . $row['name'] . "</td>";
+                    echo "<td class='text-center'>" . $row['mileage'] . "</td>";
+                    echo "<td class='text-center'>" . $row['transmission'] . "</td>";
+                    echo "<td class='text-center'>" . $row['seats'] . "</td>";
+                    echo "<td class='text-center'>" . $row['luggage'] . "</td>";
+                    echo "<td class='text-center'>" . $row['fuel'] . "</td>";
+                    echo "<td class='text-center'>" . $row['description'] . "</td>";
+                    echo "<td class='text-center'>$" . $row['price'] . "</td>";
+                    // Add buttons for update and delete
+                    echo "<td class='text-center'>
+                    <form action='update_record.php' method='get' style='display:inline; margin-right:5px;'>
+                    <input type='hidden' name='car_id' value='" . $row['id'] . "'>
+                    <button type='submit' class='btn btn-primary btn-sm'>Update</button>
+                </form>
+                
+                            <form action='deletecar.php' method='post' style='display:inline;'>
+                              <input type='hidden' name='car_id' value='" . $row['id'] . "'>
+                              <button type='submit' class='btn btn-danger btn-sm'>Delete</button>
+                            </form>
+                          </td>";
+                    echo "</tr>";
+                }
+            } else {
+                echo "<tr><td colspan='10' class='text-center'>No records found</td></tr>";
+            }
+            ?>
+        </tbody>
+    </table>
+</div>
 
-	<section class="ftco-section">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-8 col-md-10">
-                    <form action="createcar.php" method="post">
-                        <h2 class="mb-4">Add Car</h2>
-
-                        <div class="form-group">
-                            <label for="carName">Car Name</label>
-                            <input type="text" class="form-control" id="carName" name="carName" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="mileage">Mileage</label>
-                            <input type="text" class="form-control" id="mileage" name="mileage" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="transmission">Transmission</label>
-                            <input type="text" class="form-control" id="transmission" name="transmission" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="seats">Number of Seats</label>
-                            <input type="number" class="form-control" id="seats" name="seats" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="luggage">Luggage Capacity</label>
-                            <input type="number" class="form-control" id="luggage" name="luggage" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="fuel">Fuel Type</label>
-                            <input type="text" class="form-control" id="fuel" name="fuel" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="description">Description</label>
-                            <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
-                        </div>
-						<div class="form-group">
-						<input type="number" name="price" placeholder="Price" required>
-
-                        <button type="submit" class="btn btn-primary">Add Car</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </section>
-	
-      <footer class="ftco-footer ftco-bg-dark ftco-section">
+    	
+    <footer class="ftco-footer ftco-bg-dark ftco-section">
 	<div class="container">
 	  <div class="row mb-5">
 		<div class="col-md">
