@@ -102,6 +102,8 @@ $conn->close();
                 <th>Fuel</th>
                 <th>Description</th>
                 <th>Price</th>
+                <th>Availability</th>
+                <th>year</th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -121,6 +123,8 @@ $conn->close();
                     echo "<td class='text-center'>" . $row['fuel'] . "</td>";
                     echo "<td class='text-center'>" . $row['description'] . "</td>";
                     echo "<td class='text-center'>$" . $row['price'] . "</td>";
+                    echo "<td class='text-center'>" . $row['availability'] . "</td>";
+                    echo "<td class='text-center'>" . $row['year_of_make'] . "</td>";
                     // Add buttons for update and delete
                     echo "<td class='text-center'>
                     <form action='update_record.php' method='get' style='display:inline; margin-right:5px;'>

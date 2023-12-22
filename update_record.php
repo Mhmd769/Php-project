@@ -20,8 +20,6 @@ if (isset($_GET['car_id'])) {
     echo "Car ID is not set.";
     exit; // Stop execution if car_id is not set
 }
-
-// Check if the form is submitted
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Check if the car_id is set
     if (isset($_POST['car_id'])) {
@@ -36,6 +34,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $fuel = $_POST['fuel'];
         $description = $_POST['description'];
         $price = $_POST['price'];
+        $availability = isset($_POST['availability']) ? 1 : 0;
+        $year_of_make = $_POST['year_of_make'];
+
+        // Check if a new photo is uploaded
+        if (!empty($_FILES['photo']['name'])) {
+            $photo = $_FILES['photo']['name'];
+            $targetDir = "images/";
+            $targetFilePath = $targetDir . basename($photo);
+            move_uploaded_file($_FILES['photo']['tmp_name'], $targetFilePath);
+        } else {
+            // Use the existing photo if no new photo is uploaded
+            $photo = $row['photo'];
+        }
 
         // Update data in the 'cars' table
         $sql = "UPDATE cars SET 
@@ -46,7 +57,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 luggage = '$luggage',
                 fuel = '$fuel',
                 description = '$description',
-                price = '$price'
+                price = '$price',
+                availability = '$availability',
+                year_of_make = '$year_of_make',
+                photo = '$photo'
                 WHERE id = $carId";
 
         if ($conn->query($sql) === TRUE) {
@@ -107,8 +121,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </head>
 <body>
 
-    <div class="container">
-        <form id="editForm" action="" method="post">
+<div class="container">
+        <form id="editForm" action="" method="post" enctype="multipart/form-data">
             <h2 class="mb-4">Update Car Record</h2>
 
             <input type="hidden" name="car_id" value="<?= $row['id'] ?>">
@@ -127,8 +141,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <label for="transmission">Transmission:</label>
                 <input type="text" class="form-control" name="transmission" value="<?= $row['transmission'] ?>">
             </div>
-
-            <!-- Add other fields here -->
 
             <div class="form-group">
                 <label for="seats">Seats:</label>
@@ -153,6 +165,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <div class="form-group">
                 <label for="price">Price:</label>
                 <input type="text" class="form-control" name="price" value="<?= $row['price'] ?>">
+            </div>
+
+            <div class="form-group">
+                <label for="photo">Photo:</label>
+                <input type="file" class="form-control" name="photo">
+            </div>
+
+            <div class="form-group">
+                <label for="availability">Availability:</label>
+                <input type="checkbox" class="form-check-input" name="availability" <?php echo $row['availability'] ? 'checked' : ''; ?>>
+            </div>
+
+            <div class="form-group">
+                <label for="year_of_make">Year of Make:</label>
+                <input type="text" class="form-control" name="year_of_make" value="<?= $row['year_of_make'] ?>">
             </div>
 
             <button type='submit' class='btn btn-primary btn-sm'>Update</button>

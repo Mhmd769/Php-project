@@ -87,7 +87,7 @@ if (!isset($_SESSION['email'])) {
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-lg-8 col-md-10">
-                    <form action="createcar.php" method="post">
+                    <form action="createcar.php" method="post"  enctype="multipart/form-data">
                         <h2 class="mb-4">Add Car</h2>
 
                         <div class="form-group">
@@ -124,8 +124,26 @@ if (!isset($_SESSION['email'])) {
                             <label for="description">Description</label>
                             <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
                         </div>
-						<div class="form-group">
-						<input type="number" name="price" placeholder="Price" required>
+                        <div class="form-group">
+                        <label for="photo">Car Photo</label>
+                        <input type="file" class="form-control" id="photo" name="photo" accept="image/*">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="availability">Availability</label>
+                        <select class="form-control" id="availability" name="availability" required>
+                            <option value="available">Available</option>
+                            <option value="not_available">Not Available</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                    <label for="year_of_make">Year of Make</label>
+                    <input type="number" class="form-control" id="year_of_make" name="year_of_make" required>
+                </div>
+
+                    <div class="form-group">
+                    <input type="number" name="price" placeholder="Price" required>
 
                         <button type="submit" class="btn btn-primary">Add Car</button>
                     </form>

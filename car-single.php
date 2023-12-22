@@ -1,24 +1,24 @@
 <?php
-// Start the session
 session_start();
+require_once 'dbcon.php';
 
-// Check if the user is not logged in
-if (!isset($_SESSION['email'])) {
-    // Redirect to the login page or perform any other action
-    header("Location: login.php");
-    exit();
-}
-?>
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}   
 
+if (isset($_GET['car_id'])) {
+    $carId = $_GET['car_id'];
+    $result = $conn->query("SELECT * FROM cars WHERE id = $carId");
 
-<?php
-session_start();
-
-// Logout Process
-if (isset($_GET['logout'])) {
-    session_destroy();
-    header("Location: Login.php");
-    exit();
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+    } else {
+        echo "No car found with the provided ID.";
+        exit; // Stop execution if no car is found
+    }
+} else {
+    echo "Car ID is not set.";
+    exit; // Stop execution if car_id is not set
 }
 ?>
 
@@ -26,7 +26,7 @@ if (isset($_GET['logout'])) {
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Carbook - Free Bootstrap 4 Template by Colorlib</title>
+    <title>Car details</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     
@@ -88,115 +88,132 @@ if (isset($_GET['logout'])) {
       </div>
     </section>
 		
+	<section class="hero-wrap hero-wrap-2 js-fullheight" style="background-image: url('images/bg_3.jpg');" data-stellar-background-ratio="0.5">
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="row no-gutters slider-text js-fullheight align-items-end justify-content-start">
+            <div class="col-md-9 ftco-animate pb-5">
+                <p class="breadcrumbs"><span class="mr-2"><a href="index.php">Home <i class="ion-ios-arrow-forward"></i></a></span> <span>Car details <i class="ion-ios-arrow-forward"></i></span></p>
+                <h1 class="mb-3 bread">Car Details</h1>
+            </div>
+        </div>
+    </div>
+</section>
 
-		<section class="ftco-section ftco-car-details">
-      <div class="container">
-      	<div class="row justify-content-center">
-      		<div class="col-md-12">
-      			<div class="car-details">
-      				<div class="img rounded" style="background-image: url(images/bg_1.jpg);"></div>
-      				<div class="text text-center">
-      					<span class="subheading">Cheverolet</span>
-      					<h2>Mercedes Grand Sedan</h2>
-      				</div>
-      			</div>
-      		</div>
-      	</div>
-      	<div class="row">
-      		<div class="col-md d-flex align-self-stretch ftco-animate">
-            <div class="media block-6 services">
-              <div class="media-body py-md-4">
-              	<div class="d-flex mb-3 align-items-center">
-	              	<div class="icon d-flex align-items-center justify-content-center"><span class="flaticon-dashboard"></span></div>
-	              	<div class="text">
-		                <h3 class="heading mb-0 pl-3">
-		                	Mileage
-		                	<span>40,000</span>
-		                </h3>
-	                </div>
+<section class="ftco-section ftco-car-details">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-12">
+                <div class="car-details">
+                    <div class="img rounded" style="background-image: url('images/<?php echo $row['photo']; ?>');"></div>
+                    <div class="text text-center">
+                        <h2><?php echo $row['name']; ?></h2>
+						<h2>Car Year: <?php echo $row['year_of_make']; ?> </h2>
+                    </div>
                 </div>
-              </div>
-            </div>      
-          </div>
-          <div class="col-md d-flex align-self-stretch ftco-animate">
-            <div class="media block-6 services">
-              <div class="media-body py-md-4">
-              	<div class="d-flex mb-3 align-items-center">
-	              	<div class="icon d-flex align-items-center justify-content-center"><span class="flaticon-pistons"></span></div>
-	              	<div class="text">
-		                <h3 class="heading mb-0 pl-3">
-		                	Transmission
-		                	<span>Manual</span>
-		                </h3>
-	                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md d-flex align-self-stretch ftco-animate">
+                <div class="media block-6 services">
+                    <div class="media-body py-md-4">
+                        <div class="d-flex mb-3 align-items-center">
+                            <div class="icon d-flex align-items-center justify-content-center"><span class="flaticon-dashboard"></span></div>
+                            <div class="text">
+                                <h3 class="heading mb-0 pl-3">
+                                    Mileage
+                                    <span><?php echo $row['mileage']; ?></span>
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>      
+            </div>
+            
+            <div class="col-md d-flex align-self-stretch ftco-animate">
+                <div class="media block-6 services">
+                    <div class="media-body py-md-4">
+                        <div class="d-flex mb-3 align-items-center">
+                            <div class="icon d-flex align-items-center justify-content-center"><span class="flaticon-pistons"></span></div>
+                            <div class="text">
+                                <h3 class="heading mb-0 pl-3">
+                                    Transmission
+                                    <span><?php echo $row['transmission']; ?></span>
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>      
+            </div>
+            
+            <div class="col-md d-flex align-self-stretch ftco-animate">
+                <div class="media block-6 services">
+                    <div class="media-body py-md-4">
+                        <div class="d-flex mb-3 align-items-center">
+                            <div class="icon d-flex align-items-center justify-content-center"><span class="flaticon-car-seat"></span></div>
+                            <div class="text">
+                                <h3 class="heading mb-0 pl-3">
+                                    Seats
+                                    <span><?php echo $row['seats']; ?> Adults</span>
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>      
+            </div>
+            
+            <div class="col-md d-flex align-self-stretch ftco-animate">
+                <div class="media block-6 services">
+                    <div class="media-body py-md-4">
+                        <div class="d-flex mb-3 align-items-center">
+                            <div class="icon d-flex align-items-center justify-content-center"><span class="flaticon-backpack"></span></div>
+                            <div class="text">
+                                <h3 class="heading mb-0 pl-3">
+                                    Luggage
+                                    <span><?php echo $row['luggage']; ?> Bags</span>
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>      
+            </div>
+            
+            <div class="col-md d-flex align-self-stretch ftco-animate">
+                <div class="media block-6 services">
+                    <div class="media-body py-md-4">
+                        <div class="d-flex mb-3 align-items-center">
+                            <div class="icon d-flex align-items-center justify-content-center"><span class="flaticon-diesel"></span></div>
+                            <div class="text">
+                                <h3 class="heading mb-0 pl-3">
+                                    Fuel
+                                    <span><?php echo $row['fuel']; ?></span>
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>      
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-12 pills">
+                <div class="bd-example bd-example-tabs">
+                    <div class="d-flex justify-content-center">
+                      <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                        <li class="nav-item">
+                          <a class="nav-link" id="pills-manufacturer-tab" data-toggle="pill" href="#pills-manufacturer" role="tab" aria-controls="pills-manufacturer" aria-expanded="true">Description</a>
+                        </li>
+                      </ul>
+                    </div>
+                        <div class="colorlib" id="pills-manufacturer" aria-labelledby="pills-manufacturer-tab">
+                          <p><?php echo $row['description']; ?></p>
+                        </div>
+                    </div>
                 </div>
-              </div>
-            </div>      
-          </div>
-          <div class="col-md d-flex align-self-stretch ftco-animate">
-            <div class="media block-6 services">
-              <div class="media-body py-md-4">
-              	<div class="d-flex mb-3 align-items-center">
-	              	<div class="icon d-flex align-items-center justify-content-center"><span class="flaticon-car-seat"></span></div>
-	              	<div class="text">
-		                <h3 class="heading mb-0 pl-3">
-		                	Seats
-		                	<span>5 Adults</span>
-		                </h3>
-	                </div>
-                </div>
-              </div>
-            </div>      
-          </div>
-          <div class="col-md d-flex align-self-stretch ftco-animate">
-            <div class="media block-6 services">
-              <div class="media-body py-md-4">
-              	<div class="d-flex mb-3 align-items-center">
-	              	<div class="icon d-flex align-items-center justify-content-center"><span class="flaticon-backpack"></span></div>
-	              	<div class="text">
-		                <h3 class="heading mb-0 pl-3">
-		                	Luggage
-		                	<span>4 Bags</span>
-		                </h3>
-	                </div>
-                </div>
-              </div>
-            </div>      
-          </div>
-          <div class="col-md d-flex align-self-stretch ftco-animate">
-            <div class="media block-6 services">
-              <div class="media-body py-md-4">
-              	<div class="d-flex mb-3 align-items-center">
-	              	<div class="icon d-flex align-items-center justify-content-center"><span class="flaticon-diesel"></span></div>
-	              	<div class="text">
-		                <h3 class="heading mb-0 pl-3">
-		                	Fuel
-		                	<span>Petrol</span>
-		                </h3>
-	                </div>
-                </div>
-              </div>
-            </div>      
-          </div>
-      	</div>
-      	<div class="row">
-      		<div class="col-md-12 pills">
-						<div class="bd-example bd-example-tabs">
-							<div class="d-flex justify-content-center">
-							  <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
-							    <li class="nav-item">
-							      <a class="nav-link" id="pills-manufacturer-tab" data-toggle="pill" href="#pills-manufacturer" role="tab" aria-controls="pills-manufacturer" aria-expanded="true">Description</a>
-							    </li>
-							  </ul>
-							</div>
-						    <div class="colorlib" id="pills-manufacturer" aria-labelledby="pills-manufacturer-tab">
-						      <p>Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small line of blind text by the name of Lorem Ipsum decided to leave for the far World of Grammar.</p>
-							<p>When she reached the first hills of the Italic Mountains, she had a last view back on the skyline of her hometown Bookmarksgrove, the headline of Alphabet Village and the subline of her own road, the Line Lane. Pityful a rethoric question ran over her cheek, then she continued her way.</p>
-							</div>
-						</div>
-					</div>
-    		</div>
-    </section>
+            </div>
+        </div>
+    </div>
+</section>
 <footer class="ftco-footer ftco-bg-dark ftco-section">
 	<div class="container">
 	  <div class="row mb-5">
