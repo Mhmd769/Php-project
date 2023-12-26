@@ -92,40 +92,54 @@ $result = $conn->query($sql);
         <div class="row">
             <?php
             // Check if there are cars to display
-			if ($result->num_rows > 0) {
-				// Output data of each row
-				while ($row = $result->fetch_assoc()) {
-					$carId = $row['id'];
-					$carName = $row['name'];
-					$price = $row['price'];
-					$photo = $row['photo'];
-					$year=$row['year_of_make']
-					?>
-					<div class="col-md-4">
-						<div class="car-wrap rounded ftco-animate">
-							<div class="img rounded d-flex align-items-end" style="background-image: url('images/<?php echo $photo; ?>');">
-							</div>
-							<div class="text">
-								<h2 class="mb-0"><a href="car-single.php?id=<?php echo $carId; ?>"><?php echo $carName ; ?> - <?php echo $year ; ?></a></h2>
-								<div class="d-flex mb-3">
-									<p class="price ml-auto"><?php echo $price; ?> <span>/day</span></p>
-								</div>
-								<p class="d-flex mb-0 d-block">
-									<a href="#" class="btn btn-primary py-2 mr-1">Book now</a> 
-									<a href="car-single.php?car_id=<?php echo $carId; ?>" class="btn btn-secondary py-2 ml-1">Details</a>
-								</p>
-							</div>
-						</div>
-					</div>
-					<?php
-				}
-			} else {
-				echo "No cars found.";
-			}
-			?>
+            if ($result->num_rows > 0) {
+                // Output data of each row
+                while ($row = $result->fetch_assoc()) {
+                    $carId = $row['id'];
+                    $carName = $row['name'];
+                    $price = $row['price'];
+                    $photo = $row['photo'];
+                    $year = $row['year_of_make'];
+                    $isAvailable = $row['availability']; // Assuming 'availability' is a column in your database indicating availability
+                    ?>
+                    <div class="col-md-4">
+                        <div class="car-wrap rounded ftco-animate">
+                            <div class="img rounded d-flex align-items-end" style="background-image: url('images/<?php echo $photo; ?>');">
+                            </div>
+
+                            <div class="text">
+                                <h2 class="mb-0"><a href="car-single.php?id=<?php echo $carId; ?>"><?php echo $carName; ?> - <?php echo $year; ?></a></h2>
+								<?php
+                                // Display availability status as text
+                                echo $isAvailable ? '<span class="availability text-success">&#10003; Available</span>' : '<span class="availability text-danger">&#10007; Not Available</span>';
+                                ?>
+                                <div class="d-flex mb-3">
+                                    <p class="price ml-auto"><?php echo $price; ?> <span>/day</span></p>
+                                </div>
+                                <p class="d-flex mb-0 d-block">
+                                    <?php
+                                    // Display "Book now" button or disabled state based on availability
+                                    if ($isAvailable) {
+                                        echo '<a href="#" class="btn btn-primary py-2 mr-1">Book now</a>';
+                                    } else {
+                                        echo '<span class="btn btn-danger py-2 mr-1" disabled>Not available</span>';
+                                    }
+                                    ?>
+                                    <a href="car-single.php?car_id=<?php echo $carId; ?>" class="btn btn-secondary py-2 ml-1">Details</a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <?php
+                }
+            } else {
+                echo "No cars found.";
+            }
+            ?>
         </div>
     </div>
 </section>
+
 
 
     <footer class="ftco-footer ftco-bg-dark ftco-section">
