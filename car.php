@@ -96,29 +96,6 @@ $conn->close();
 
 <body>
 
-	<nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
-		<div class="container">
-			<a class="navbar-brand" href="index.php">Car<span>Book</span></a>
-			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
-				<span class="oi oi-menu"></span> Menu
-			</button>
-
-			<div class="collapse navbar-collapse" id="ftco-nav">
-				<ul class="navbar-nav ml-auto">
-					<li class="nav-item"><a href="index.php" class="nav-link">Home</a></li>
-					<li class="nav-item active"><a href="car.php" class="nav-link">Cars</a></li>
-					<li class="nav-item"><a href="FeedBack.php" class="nav-link">FeedBack</a></li>
-					<?php if (isset($_SESSION['email'])) : ?>
-						<li class="nav-item">
-							<a class="nav-link" href="?logout">Logout</a>
-						</li>
-					<?php endif; ?>
-				</ul>
-			</div>
-		</div>
-	</nav>
-	<!-- END nav -->
-
 	<section class="hero-wrap hero-wrap-2 js-fullheight" style="background-image: url('images/bg_3.jpg');" data-stellar-background-ratio="0.5">
 		<div class="overlay"></div>
 		<div class="container">
@@ -133,6 +110,77 @@ $conn->close();
 
 	<section class="ftco-section bg-light">
     <div class="container">
+        <!-- Form for Year Filter -->
+        <div class="search-form-container">
+            <form action="car.php" method="post" class="search-form">
+                <div class="form-group">
+                    <label for="year_filter">Filter by Year:</label>
+                    <input type="text" name="year_filter" class="form-control" placeholder="Enter Year">
+                </div>
+                <button type="submit" class="btn btn-primary">Filter by Year</button>
+            </form>
+        </div>
+
+        <!-- Form for General Search -->
+        <div class="search-form-container">
+            <form action="car.php" method="post" class="search-form">
+                <div class="form-group">
+                    <span class="icon icon-search"></span>
+                    <input type="text" name="search" class="form-control" placeholder="Search...">
+                </div>
+                <button type="submit" class="btn btn-primary">Search</button>
+            </form>
+        </div>
+
+        <!-- Display search message if set -->
+        <?php if (isset($searchMessage)) : ?>
+            <p class="text-danger"><?php echo $searchMessage; ?></p>
+        <?php endif; ?>
+    </div>
+</section>
+
+			<div class="row">
+				<?php
+				// Check if there are cars to display
+				if ($result->num_rows > 0) {
+					// Output data of each row
+					while ($row = $result->fetch_assoc()) {
+						$carId = $row['id'];
+						$carName = $row['name'];
+						$price = $row['price'];
+						$photo = $row['photo'];
+						$year = $row['year_of_make'];
+				?>
+
+
+						<div class="col-md-4 mt-36">
+							<div class="car-wrap rounded ftco-animate">
+								<div class="img rounded d-flex align-items-end" style="background-image: url('images/<?php echo $photo; ?>');">
+								</div>
+								<div class="text">
+									<h2 class="mb-0">
+										<a href="car-single.php?car_id=<?php echo $carId; ?>"><?php echo $carName; ?> - <?php echo $year; ?></a>
+									</h2>
+									<div class="d-flex mb-3">
+										<p class="price ml-auto"><?php echo $price; ?> <span>/day</span></p>
+									</div>
+									<p class="d-flex mb-0 d-block">
+										<a href="booking.php?car_id=<?php echo $carId; ?>" class="btn btn-primary py-2 mr-1">Book now</a>
+										<a href="car-single.php?car_id=<?php echo $carId; ?>" class="btn btn-secondary py-2 ml-1">Details</a>
+									</p>
+								</div>
+							</div>
+						</div>
+
+				<?php
+
+					}
+				} else {
+					echo "No cars found.";
+				}
+				?>
+			</div>
+		</div>
         <div class="row">
             <?php
             // Check if there are cars to display
@@ -183,92 +231,6 @@ $conn->close();
         </div>
     </div>
 </section>
-
-
-
-    <footer class="ftco-footer ftco-bg-dark ftco-section">
-		<div class="container">
-		  <div class="row mb-5">
-			<div class="col-md">
-			  <div class="ftco-footer-widget mb-4">
-				<h2 class="ftco-heading-2"><a href="#" class="logo">Car<span>book</span></a></h2>
-				<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
-				<ul class="ftco-footer-social list-unstyled float-md-left float-lft mt-5">
-				  <li class="ftco-animate"><a href="#"><span class="icon-twitter"></span></a></li>
-				  <li class="ftco-animate"><a href="#"><span class="icon-facebook"></span></a></li>
-				  <li class="ftco-animate"><a href="#"><span class="icon-instagram"></span></a></li>
-				</ul>
-			  </div>
-		<div class="container">
-
-
-			<!-- make a form for search -->
-			<div class="for absolute right-12 top-0	 ">
-				<div class="search">
-					<!-- make a form for search -->
-					<form action="car.php" method="post" class="search-form">
-						<div class="form-group">
-							<label for="year_filter">Filter by Year:</label>
-							<input type="text" name="year_filter" class="form-control" placeholder="Enter Year">
-						</div>
-
-						<div class="form-group">
-							<span class="icon icon-search"></span>
-							<input type="text" name="search" class="form-control " placeholder="Search...">
-						</div>
-						<button type="submit" class="btn btn-primary">Search</button>
-					</form>
-				</div>
-				<?php if (isset($searchMessage)) : ?>
-					<p class="text-danger"><?php echo $searchMessage; ?></p>
-				<?php endif; ?>
-			</div>
-
-
-			<div class="row">
-				<?php
-				// Check if there are cars to display
-				if ($result->num_rows > 0) {
-					// Output data of each row
-					while ($row = $result->fetch_assoc()) {
-						$carId = $row['id'];
-						$carName = $row['name'];
-						$price = $row['price'];
-						$photo = $row['photo'];
-						$year = $row['year_of_make'];
-				?>
-
-
-						<div class="col-md-4 mt-36">
-							<div class="car-wrap rounded ftco-animate">
-								<div class="img rounded d-flex align-items-end" style="background-image: url('images/<?php echo $photo; ?>');">
-								</div>
-								<div class="text">
-									<h2 class="mb-0">
-										<a href="car-single.php?car_id=<?php echo $carId; ?>"><?php echo $carName; ?> - <?php echo $year; ?></a>
-									</h2>
-									<div class="d-flex mb-3">
-										<p class="price ml-auto"><?php echo $price; ?> <span>/day</span></p>
-									</div>
-									<p class="d-flex mb-0 d-block">
-										<a href="booking.php?car_id=<?php echo $carId; ?>" class="btn btn-primary py-2 mr-1">Book now</a>
-										<a href="car-single.php?car_id=<?php echo $carId; ?>" class="btn btn-secondary py-2 ml-1">Details</a>
-									</p>
-								</div>
-							</div>
-						</div>
-
-				<?php
-
-					}
-				} else {
-					echo "No cars found.";
-				}
-				?>
-			</div>
-		</div>
-	</section>
-
 
 	<footer class="ftco-footer ftco-bg-dark ftco-section">
 		<div class="container">

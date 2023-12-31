@@ -1,159 +1,123 @@
 <?php
+session_start();
 
-session_start(); // Start or resume a session
-include('dbcon.php');
-// Handle form submission
+// Include your database connection code here
+require_once 'dbcon.php'; // Adjust the path as needed
+
+if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
+    // Redirect to login page or handle accordingly
+    header("Location: login.php"); // Adjust the path as needed
+    exit();
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $_SESSION['car_id'] = isset($_POST['car_id']) ? $_POST['car_id'] : '';
-    $_SESSION['start_date'] = isset($_POST['start_date']) ? $_POST['start_date'] : '';
-    $_SESSION['end_date'] = isset($_POST['end_date']) ? $_POST['end_date'] : '';
-    $_SESSION['phone_number'] = isset($_POST['phone_number']) ? $_POST['phone_number'] : '';
+    // Retrieve and sanitize input data
+    $car_id = $_POST["car_id"];
+    $start_date = $_POST["start_date"];
+    $end_date = $_POST["end_date"];
 
-    // Add other necessary session data
+    // Calculate the number of days
+    $nb_of_days = (strtotime($end_date) - strtotime($start_date)) / (60 * 60 * 24);
 
-    // Redirect to payment.php
-   header("Location: newpayment.php");
-        exit();
+    // Retrieve car price from the database
+    $car_price_sql = "SELECT price FROM cars WHERE id = ?";
+    $car_price_stmt = $conn->prepare($car_price_sql);
+    $car_price_stmt->bind_param("i", $car_id);
+    $car_price_stmt->execute();
+    $car_price_result = $car_price_stmt->get_result();
+
+    if ($car_price_result->num_rows > 0) {
+        $car_row = $car_price_result->fetch_assoc();
+        $car_price = $car_row["price"];
+
+        // Calculate total amount
+        $total_amount = $nb_of_days * $car_price;
+
+        // Get user ID from the session
+        $user_id = $_SESSION['user_id'];
+
+        // Save booking details to the database
+        $booking_sql = "INSERT INTO bookings (user_id, car_id, start_date, end_date, number_of_days, total_payment, status) 
+                        VALUES (?, ?, ?, ?, ?, ?, 'unpaid')";
+
+        $booking_stmt = $conn->prepare($booking_sql);
+        $booking_stmt->bind_param("iissdd", $user_id, $car_id, $start_date, $end_date, $nb_of_days, $total_amount);
+
+        if ($booking_stmt->execute()) {
+            // Redirect to the payment page with the booking_id parameter
+            $booking_id = $booking_stmt->insert_id;
+            header("Location: payment.php?booking_id=$booking_id&success=1");
+            exit();
+        } else {
+            echo "Error: " . $booking_stmt->error;
+        }
+    } else {
+        echo "Car not found";
+    }
 }
 
-// The rest of your existing code...
-
+// Retrieve car data for the form
+$cars_sql = "SELECT id, name FROM cars";
+$cars_result = $conn->query($cars_sql);
 ?>
+<!-- Rest of your HTML code -->
 
-<?php
-include('dbcon.php');
-
-$carId = isset($_GET['car_id']) ? $_GET['car_id'] : '';
-$availability = isset($_GET['availability']) ? $_GET['availability'] : '';
-
-// Build the SQL query based on the search parameters
-$query = "SELECT * FROM cars";
-
-if (!empty($carId)) {
-    $query .= " WHERE id = ?";
-}
-
-if ($availability == 'available') {
-    $query .= " AND availability = 1";
-} elseif ($availability == 'unavailable') {
-    $query .= " AND availability = 0";
-}
-
-// Prepare and execute the query 
-$stmt = $conn->prepare($query);
-if (!empty($carId)) {
-    $stmt->bind_param('i', $carId);
-}
-$stmt->execute();
-$result = $stmt->get_result();
-
-
-// Close the database connection
-$stmt->close();
-$conn->close();
-?>
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Car Rental Booking</title>
-    <style>
-        /* Add your styles here */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-            text-align: center;
-        }
-
-        h1 {
-            color: #333;
-        }
-
-        form {
-            max-width: 400px;
-            margin: 20px auto;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-        }
-
-        input {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            box-sizing: border-box;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        button {
-            background-color: #4caf50;
-            color: white;
-            padding: 15px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        button:hover {
-            background-color: #45a049;
-        }
-    </style>
+    <title>Car Booking</title>
 </head>
-
 <body>
-    <h1>Car Rental Booking</h1>
+    <h2>Car Booking</h2>
 
-    <form id="bookingForm" action=" newpayment.php" method="post" onsubmit="return validateBookingForm()">
-    <input type="hidden" name="car_id" value="<?php echo $carId; ?>">
-    
-    <label for="start_date">Start Date:</label>
-    <input type="date" name="start_date" required>
-
-    <label for="end_date">End Date:</label>
-    <input type="date" name="end_date" required>
-
-    <label for="phone_number">Phone Number:</label>
-    <input type="tel" name="phone_number" required>
-
-    <!-- Add other necessary form fields -->
-
-    <button type="submit">Proceed to Payment</button>
-</form>
-
-<script>
-    document.getElementById('bookingForm').addEventListener('submit', function(event) {
-        event.preventDefault(); // Prevent the default form submission
-
-        if (validateBookingForm()) {
-            // If validation is successful, manually navigate to payment.php
-            window.location.href = 'newpayment.php';
-        }
-    });
-
-    function validateBookingForm() {
-        // Add any additional validation logic here
-        var startDate = document.getElementsByName('start_date')[0].value;
-        var endDate = document.getElementsByName('end_date')[0].value;
-
-        // Basic date validation
-        if (startDate >= endDate) {
-            alert('End date must be greater than start date.');
-            return false;
-        }
-
-        return true;
+    <?php
+    if (isset($_GET['success']) && $_GET['success'] == 1) {
+        echo "<p>Booking successful. Proceed to payment below:</p>";
     }
-</script>
+    ?>
+
+    <form action="booking.php" method="post">
+        <label for="car_id">Select Car:</label>
+        <select name="car_id" required>
+            <?php
+            // Display car options
+            while ($car_row = $cars_result->fetch_assoc()) {
+                echo "<option value='{$car_row['id']}'>{$car_row['name']}</option>";
+            }
+            ?>
+        </select>
+
+        <label for="start_date">Start Date:</label>
+        <input type="date" name="start_date" required>
+
+        <label for="end_date">End Date:</label>
+        <input type="date" name="end_date" required>
+
+        <!-- Added phone number input -->
+        <label for="phone_number">Phone Number:</label>
+        <input type="text" name="phone_number" required>
+
+        <button type="submit">Proceed to Payment</button>
+    </form>
+
+    <script>
+        // Calculate and display the total amount based on car price and number of days
+        document.querySelector('select[name="car_id"]').addEventListener('change', function () {
+            // Retrieve car price and calculate total amount
+            var carId = this.value;
+            var carPriceUrl = 'get_car_price.php?car_id=' + carId;
+            fetch(carPriceUrl)
+                .then(response => response.json())
+                .then(data => {
+                    var nbOfDays = parseInt(document.querySelector('input[name="end_date"]').value) - 
+                                    parseInt(document.querySelector('input[name="start_date"]').value);
+                    var totalAmount = data.price * nbOfDays;
+                    document.getElementById('total_amount').innerText = totalAmount.toFixed(2);
+                });
+        });
+    </script>
+</body>
+</html>

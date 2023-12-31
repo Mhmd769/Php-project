@@ -58,6 +58,7 @@ if (isset($_GET['logout'])) {
 	        <ul class="navbar-nav ml-auto">
 	          <li class="nav-item active"><a href="index.php" class="nav-link">Home</a></li>
 	          <li class="nav-item"><a href="car.php" class="nav-link">Cars</a></li>
+            <li class="nav-item"><a href="stat.php" class="nav-link">stat</a></li>
 	          <li class="nav-item"><a href="FeedBack.php" class="nav-link">FeedBack</a></li>
             <?php if (isset($_SESSION['email'])) : ?>
               <li class="nav-item">
