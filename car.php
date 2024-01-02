@@ -96,6 +96,30 @@ $conn->close();
 
 <body>
 
+    
+<nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
+	    <div class="container">
+	      <a class="navbar-brand" href="index.html">Car<span>Book</span></a>
+	      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
+	        <span class="oi oi-menu"></span> Menu
+	      </button>
+
+	      <div class="collapse navbar-collapse" id="ftco-nav">
+	        <ul class="navbar-nav ml-auto">
+	          <li class="nav-item"><a href="index.php" class="nav-link">Home</a></li>
+	          <li class="nav-item"><a href="car.php" class="nav-link">Cars</a></li>
+	          <li class="nav-item active"><a href="FeedBack.php" class="nav-link">FeedBacks</a></li>
+            <?php if (isset($_SESSION['email'])) : ?>
+              <li class="nav-item">
+                <a class="nav-link" href="?logout">Logout</a>
+              </li>
+            <?php endif; ?>
+	        </ul>
+	      </div>
+	    </div>
+	  </nav>
+    <!-- END nav -->
+
 	<section class="hero-wrap hero-wrap-2 js-fullheight" style="background-image: url('images/bg_3.jpg');" data-stellar-background-ratio="0.5">
 		<div class="overlay"></div>
 		<div class="container">
@@ -181,55 +205,6 @@ $conn->close();
 				?>
 			</div>
 		</div>
-        <div class="row">
-            <?php
-            // Check if there are cars to display
-            if ($result->num_rows > 0) {
-                // Output data of each row
-                while ($row = $result->fetch_assoc()) {
-                    $carId = $row['id'];
-                    $carName = $row['name'];
-                    $price = $row['price'];
-                    $photo = $row['photo'];
-                    $year = $row['year_of_make'];
-                    $isAvailable = $row['availability']; // Assuming 'availability' is a column in your database indicating availability
-                    ?>
-                    <div class="col-md-4">
-                        <div class="car-wrap rounded ftco-animate">
-                            <div class="img rounded d-flex align-items-end" style="background-image: url('images/<?php echo $photo; ?>');">
-                            </div>
-
-                            <div class="text">
-                                <h2 class="mb-0"><a href="car-single.php?id=<?php echo $carId; ?>"><?php echo $carName; ?> - <?php echo $year; ?></a></h2>
-								<?php
-                                // Display availability status as text
-                                echo $isAvailable ? '<span class="availability text-success">&#10003; Available</span>' : '<span class="availability text-danger">&#10007; Not Available</span>';
-                                ?>
-                                <div class="d-flex mb-3">
-                                    <p class="price ml-auto"><?php echo $price; ?> <span>/day</span></p>
-                                </div>
-                                <p class="d-flex mb-0 d-block">
-                                    <?php
-                                    // Display "Book now" button or disabled state based on availability
-                                    if ($isAvailable) {
-                                        echo '<a href="#" class="btn btn-primary py-2 mr-1">Book now</a>';
-                                    } else {
-                                        echo '<span class="btn btn-danger py-2 mr-1" disabled>Not available</span>';
-                                    }
-                                    ?>
-                                    <a href="car-single.php?car_id=<?php echo $carId; ?>" class="btn btn-secondary py-2 ml-1">Details</a>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <?php
-                }
-            } else {
-                echo "No cars found.";
-            }
-            ?>
-        </div>
-    </div>
 </section>
 
 	<footer class="ftco-footer ftco-bg-dark ftco-section">

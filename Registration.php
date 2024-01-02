@@ -38,6 +38,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["register"])) {
 
         if ($insertUserStmt->execute()) {
             // Log in the newly registered user
+            $user_id = $conn->insert_id;
+            $_SESSION["user_id"] = $user_id;
             $_SESSION["email"] = $email;
             $_SESSION["role"] = $role;
 

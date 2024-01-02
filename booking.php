@@ -4,12 +4,11 @@ session_start();
 // Include your database connection code here
 require_once 'dbcon.php'; // Adjust the path as needed
 
-if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
+if (!isset($_SESSION['user_id'])) {
     // Redirect to login page or handle accordingly
-    header("Location: login.php"); // Adjust the path as needed
+    header("Location: login.php");
     exit();
 }
-
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Retrieve and sanitize input data
     $car_id = $_POST["car_id"];
