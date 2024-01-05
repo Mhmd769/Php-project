@@ -9,12 +9,15 @@ if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
 }
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Retrieve and sanitize input data
     $car_id = $_POST["car_id"];
+    $car_name = $_POST["car_name"];
     $start_date = $_POST["start_date"];
     $end_date = $_POST["end_date"];
-    $phone_number = $_POST["phone_number"]; 
+    $phone_number = $_POST["phone_number"];
+
     // Calculate the number of days
     $nb_of_days = (strtotime($end_date) - strtotime($start_date)) / (60 * 60 * 24);
 
@@ -37,7 +40,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Save booking details to the database
         $booking_sql = "INSERT INTO bookings (user_id, car_id, start_date, end_date, phone_number, number_of_days, total_payment, status) 
-                        VALUES (?, ?, ?, ? , ?, ?, ?, 'unpaid')";
+        VALUES (?, ?, ?, ? , ?, ?, ?, 'unpaid')";
 
         $booking_stmt = $conn->prepare($booking_sql);
         $booking_stmt->bind_param("iissdsd", $user_id, $car_id, $start_date, $end_date, $phone_number, $nb_of_days, $total_amount);
@@ -58,6 +61,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 // Retrieve car data for the form
 $cars_sql = "SELECT id, name FROM cars";
 $cars_result = $conn->query($cars_sql);
+
 ?>
 <!-- Rest of your HTML code -->
 
@@ -69,63 +73,63 @@ $cars_result = $conn->query($cars_sql);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Car Booking</title>
 
-    <style> 
-        body { 
-            font-family: 'Arial', sans-serif; 
-            background-color: #f4f4f4; 
-            margin: 0; 
-            padding: 0; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            height: 100vh; 
-        } 
- 
-        h2 { 
-            color: #333; 
-        } 
- 
-        form { 
-            background-color: #fff; 
-            padding: 20px; 
-            border-radius: 8px; 
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
-            width: 300px; 
-        } 
- 
-        label { 
-            display: block; 
-            margin-bottom: 8px; 
-            color: #555; 
-        } 
- 
-        select, 
-        input, 
-        button { 
-            width: 100%; 
-            padding: 10px; 
-            margin-bottom: 16px; 
-            box-sizing: border-box; 
-            border: 1px solid #ccc; 
-            border-radius: 4px; 
-        } 
- 
-        button { 
-            background-color: #4caf50; 
-            color: #fff; 
-            cursor: pointer; 
-        } 
- 
-        button:hover { 
-            background-color: #45a049; 
-        } 
- 
-        p { 
-            color: #4caf50; 
-            font-weight: bold; 
-        } 
-    </style> 
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        select,
+        input,
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #4caf50;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        p {
+            color: #4caf50;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
     <h2>Car Booking</h2>
@@ -138,7 +142,7 @@ $cars_result = $conn->query($cars_sql);
 
     <form action="booking.php" method="post">
         <label for="car_id">Select Car:</label>
-        <select name="car_id" required>
+        <select name="car_id" id="car_id" required>
             <?php
             // Display car options
             while ($car_row = $cars_result->fetch_assoc()) {
@@ -147,33 +151,45 @@ $cars_result = $conn->query($cars_sql);
             ?>
         </select>
 
+        <!-- Hidden input field for car name -->
+        <input type="hidden" name="car_name" id="car_name">
+
         <label for="start_date">Start Date:</label>
         <input type="date" name="start_date" required>
 
         <label for="end_date">End Date:</label>
         <input type="date" name="end_date" required>
 
-        <label for="phone_number">Phone Number:</label> 
-        <input type="text" name="phone_number" required> 
+        <label for="phone_number">Phone Number:</label>
+        <input type="text" name="phone_number" required>
 
         <button type="submit">Proceed to Payment</button>
-    </form>
+         <!-- Back button -->
+    <button onclick="goBack()">Go Back</button>
 
     <script>
         // Calculate and display the total amount based on car price and number of days
-        document.querySelector('select[name="car_id"]').addEventListener('change', function () {
-            // Retrieve car price and calculate total amount
-            var carId = this.value;
-            var carPriceUrl = 'get_car_price.php?car_id=' + carId;
-            fetch(carPriceUrl)
-                .then(response => response.json())
-                .then(data => {
-                    var nbOfDays = parseInt(document.querySelector('input[name="end_date"]').value) - 
-                                    parseInt(document.querySelector('input[name="start_date"]').value);
-                    var totalAmount = data.price * nbOfDays;
-                    document.getElementById('total_amount').innerText = totalAmount.toFixed(2);
-                });
+        document.addEventListener('DOMContentLoaded', function () {
+            // Retrieve car_id and car_name from the URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const carId = urlParams.get('car_id');
+            const carName = urlParams.get('car_name');
+
+            // Set the selected car in the dropdown
+            const carDropdown = document.getElementById('car_id');
+            const carOption = document.querySelector(`option[value='${carId}']`);
+            if (carOption) {
+                carDropdown.value = carId;
+            }
+
+            // Set the car_name in the hidden input field
+            const carNameField = document.getElementById('car_name');
+            carNameField.value = carName;
         });
+
+        function goBack() {
+            window.history.back();
+        }
     </script>
 </body>
 </html>

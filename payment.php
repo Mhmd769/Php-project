@@ -61,6 +61,66 @@ if (isset($_GET['booking_id'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payment</title>
+
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #4caf50;
+            color: #fff;
+            cursor: pointer;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        p {
+            color: #4caf50;
+            font-weight: bold;
+            margin-bottom: 16px;
+        }
+    </style>
 </head>
 <body>
     <h2>Payment Details</h2>
@@ -70,14 +130,13 @@ if (isset($_GET['booking_id'])) {
 
         <!-- Payment form -->
         <form action="payment.php?booking_id=<?php echo $booking_id; ?>" method="post">
-            <!-- Include input fields for credit card number, CVV, etc. -->
             <label for="card_number">Card Number:</label>
             <input type="text" name="card_number" required>
 
             <label for="cvv">CVV:</label>
             <input type="text" name="cvv" required>
 
-            <!-- Include other input fields as needed -->
+            <!-- Add other input fields as needed -->
 
             <button type="submit">Submit Payment</button>
         </form>

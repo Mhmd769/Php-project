@@ -175,8 +175,6 @@ $conn->close();
 						$photo = $row['photo'];
 						$year = $row['year_of_make'];
 				?>
-
-
 						<div class="col-md-4 mt-36">
 							<div class="car-wrap rounded ftco-animate">
 								<div class="img rounded d-flex align-items-end" style="background-image: url('images/<?php echo $photo; ?>');">
@@ -189,13 +187,12 @@ $conn->close();
 										<p class="price ml-auto"><?php echo $price; ?> <span>/day</span></p>
 									</div>
 									<p class="d-flex mb-0 d-block">
-										<a href="booking.php?car_id=<?php echo $carId; ?>" class="btn btn-primary py-2 mr-1">Book now</a>
+									<a href="booking.php?car_id=<?php echo $carId; ?>&car_name=<?php echo urlencode($carName); ?>" class="btn btn-primary py-2 mr-1">Book now</a>
 										<a href="car-single.php?car_id=<?php echo $carId; ?>" class="btn btn-secondary py-2 ml-1">Details</a>
 									</p>
 								</div>
 							</div>
 						</div>
-
 				<?php
 
 					}
