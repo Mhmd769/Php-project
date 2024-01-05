@@ -14,7 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $car_id = $_POST["car_id"];
     $start_date = $_POST["start_date"];
     $end_date = $_POST["end_date"];
-
+    $phone_number = $_POST["phone_number"]; 
     // Calculate the number of days
     $nb_of_days = (strtotime($end_date) - strtotime($start_date)) / (60 * 60 * 24);
 
@@ -36,11 +36,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $user_id = $_SESSION['user_id'];
 
         // Save booking details to the database
-        $booking_sql = "INSERT INTO bookings (user_id, car_id, start_date, end_date, number_of_days, total_payment, status) 
-                        VALUES (?, ?, ?, ?, ?, ?, 'unpaid')";
+        $booking_sql = "INSERT INTO bookings (user_id, car_id, start_date, end_date, phone_number, number_of_days, total_payment, status) 
+                        VALUES (?, ?, ?, ? , ?, ?, ?, 'unpaid')";
 
         $booking_stmt = $conn->prepare($booking_sql);
-        $booking_stmt->bind_param("iissdd", $user_id, $car_id, $start_date, $end_date, $nb_of_days, $total_amount);
+        $booking_stmt->bind_param("iissdsd", $user_id, $car_id, $start_date, $end_date, $phone_number, $nb_of_days, $total_amount);
 
         if ($booking_stmt->execute()) {
             // Redirect to the payment page with the booking_id parameter
@@ -68,6 +68,64 @@ $cars_result = $conn->query($cars_sql);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Car Booking</title>
+
+    <style> 
+        body { 
+            font-family: 'Arial', sans-serif; 
+            background-color: #f4f4f4; 
+            margin: 0; 
+            padding: 0; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            height: 100vh; 
+        } 
+ 
+        h2 { 
+            color: #333; 
+        } 
+ 
+        form { 
+            background-color: #fff; 
+            padding: 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+            width: 300px; 
+        } 
+ 
+        label { 
+            display: block; 
+            margin-bottom: 8px; 
+            color: #555; 
+        } 
+ 
+        select, 
+        input, 
+        button { 
+            width: 100%; 
+            padding: 10px; 
+            margin-bottom: 16px; 
+            box-sizing: border-box; 
+            border: 1px solid #ccc; 
+            border-radius: 4px; 
+        } 
+ 
+        button { 
+            background-color: #4caf50; 
+            color: #fff; 
+            cursor: pointer; 
+        } 
+ 
+        button:hover { 
+            background-color: #45a049; 
+        } 
+ 
+        p { 
+            color: #4caf50; 
+            font-weight: bold; 
+        } 
+    </style> 
 </head>
 <body>
     <h2>Car Booking</h2>
@@ -95,9 +153,8 @@ $cars_result = $conn->query($cars_sql);
         <label for="end_date">End Date:</label>
         <input type="date" name="end_date" required>
 
-        <!-- Added phone number input -->
-        <label for="phone_number">Phone Number:</label>
-        <input type="text" name="phone_number" required>
+        <label for="phone_number">Phone Number:</label> 
+        <input type="text" name="phone_number" required> 
 
         <button type="submit">Proceed to Payment</button>
     </form>
