@@ -31,21 +31,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($car_price_result->num_rows > 0) {
         $car_row = $car_price_result->fetch_assoc();
         $car_price = $car_row["price"];
-
+    
         // Calculate total amount
         $total_amount = $nb_of_days * $car_price;
-
+    
         // Get user ID from the session
         $user_id = $_SESSION['user_id'];
-
+    
         // Save booking details to the database
         $booking_sql = "INSERT INTO bookings (user_id, car_id, start_date, end_date, phone_number, number_of_days, total_payment, status) 
         VALUES (?, ?, ?, ? , ?, ?, ?, 'unpaid')";
-
+    
         $booking_stmt = $conn->prepare($booking_sql);
         $booking_stmt->bind_param("iissdsd", $user_id, $car_id, $start_date, $end_date, $phone_number, $nb_of_days, $total_amount);
-
+    
         if ($booking_stmt->execute()) {
+            // Mark the car as not available
+            $update_car_sql = "UPDATE cars SET availability = 0 WHERE id = ?";
+            $update_car_stmt = $conn->prepare($update_car_sql);
+            $update_car_stmt->bind_param("i", $car_id);
+            $update_car_stmt->execute();
+    
             // Redirect to the payment page with the booking_id parameter
             $booking_id = $booking_stmt->insert_id;
             header("Location: payment.php?booking_id=$booking_id&success=1");
@@ -55,7 +61,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     } else {
         echo "Car not found";
-    }
+    }    
 }
 
 // Retrieve car data for the form
@@ -141,8 +147,8 @@ $cars_result = $conn->query($cars_sql);
     ?>
 
     <form action="booking.php" method="post">
-        <label for="car_id">Select Car:</label>
-        <select name="car_id" id="car_id" required>
+        <label for="car_id" >Select Car:</label>
+        <select name="car_id" id="car_id" required  >
             <?php
             // Display car options
             while ($car_row = $cars_result->fetch_assoc()) {
@@ -152,7 +158,7 @@ $cars_result = $conn->query($cars_sql);
         </select>
 
         <!-- Hidden input field for car name -->
-        <input type="hidden" name="car_name" id="car_name">
+        <input type="hidden" name="car_name" id="car_name" disabled>
 
         <label for="start_date">Start Date:</label>
         <input type="date" name="start_date" required>

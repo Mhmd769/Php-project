@@ -164,7 +164,7 @@ $conn->close();
 </section>
 
 			<div class="row">
-				<?php
+			<?php
 				// Check if there are cars to display
 				if ($result->num_rows > 0) {
 					// Output data of each row
@@ -174,6 +174,9 @@ $conn->close();
 						$price = $row['price'];
 						$photo = $row['photo'];
 						$year = $row['year_of_make'];
+						$availability = $row['availability'] ;
+						
+
 				?>
 						<div class="col-md-4 mt-36">
 							<div class="car-wrap rounded ftco-animate">
@@ -187,9 +190,13 @@ $conn->close();
 										<p class="price ml-auto"><?php echo $price; ?> <span>/day</span></p>
 									</div>
 									<p class="d-flex mb-0 d-block">
-									<a href="booking.php?car_id=<?php echo $carId; ?>&car_name=<?php echo urlencode($carName); ?>" class="btn btn-primary py-2 mr-1">Book now</a>
-										<a href="car-single.php?car_id=<?php echo $carId; ?>" class="btn btn-secondary py-2 ml-1">Details</a>
-									</p>
+									<?php if ($availability) : ?>
+										<a href="booking.php?car_id=<?php echo $carId; ?>&car_name=<?php echo urlencode($carName); ?>" class="btn btn-primary py-2 mr-1">Book now</a>
+									<?php else : ?>
+										<button class="btn btn-danger py-2 mr-1" disabled>Not Available</button>
+									<?php endif; ?>
+									<a href="car-single.php?car_id=<?php echo $carId; ?>" class="btn btn-secondary py-2 mr-1">Details</a>
+								</p>
 								</div>
 							</div>
 						</div>

@@ -16,16 +16,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = $_POST['name'];
     $rating = $_POST['rating'];
     $message = $_POST['message'];
-
+    $photo = $_POST['photo'];
     // Ensure the rating is an integer between 1 and 5
     $rating = max(1, min($rating, 5));
 
     $userId = $_SESSION['user_id'];
     // Insert data into the feedback table
-    $sql = "INSERT INTO feedback (user_id, details, name, rate) VALUES (?, ?, ?, ?)";
+    $sql = "INSERT INTO feedback (user_id, details, name, rate, photo) VALUES (?, ?, ?, ?, ?)";
 
     $Feedback_stmt = $conn->prepare($sql);
-    $Feedback_stmt->bind_param("isss", $userId, $message, $name, $rating);
+    $Feedback_stmt->bind_param("issss", $userId, $message, $name, $rating, $photo);
 
     if ($Feedback_stmt->execute()) {
         $feedbackSubmitted = true;
@@ -36,6 +36,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header("Location: index.php");
 }
 
+  $sql = "SELECT * FROM  feedback";
+  $result = $conn ->query($sql);
+  if($result->num_rows === 0){
+    echo "No feedback available at the moment";
+  }
+//   else{
+    
+//   }
+$conn->close();
+
+
 // Logout Process
 if (isset($_GET['logout'])) {
     session_destroy();
@@ -43,9 +54,6 @@ if (isset($_GET['logout'])) {
     exit();
 }
 ?>
-
-<!DOCTYPE html>
-<html lang="en">
 
 <head>
   <title>CarRent_FeedBack</title>
@@ -90,7 +98,6 @@ if (isset($_GET['logout'])) {
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="oi oi-menu"></span> Menu
       </button>
-
       <div class="collapse navbar-collapse" id="ftco-nav">
         <ul class="navbar-nav ml-auto">
           <li class="nav-item"><a href="index.php" class="nav-link">Home</a></li>
@@ -106,8 +113,7 @@ if (isset($_GET['logout'])) {
     </div>
   </nav>
   <!-- END nav -->
-
-  <section class="hero-wrap hero-wrap-2 js-fullheight" style="background-image: url('images/bg_3.jpg');" data-stellar-background-ratio="0.5">
+<section class="hero-wrap hero-wrap-2 js-fullheight" style="background-image: url('images/bg_3.jpg');" data-stellar-background-ratio="0.5">
     <div class="overlay"></div>
     <div class="container">
       <div class="row no-gutters slider-text js-fullheight align-items-end justify-content-start">
@@ -126,6 +132,10 @@ if (isset($_GET['logout'])) {
           <form action="#" class="bg-light p-5 contact-form" method="post">
             <div class="form-group">
               <input type="text" class="form-control" placeholder="Your Name" name="name">
+            </div>
+            <div class="form-group">
+              <label for="photo">Photo Of You</label>
+              <input type="file" class="form-control" id="photo" name="photo" accept="image/*">
             </div>
             <div class="form-group">
               <select class="form-control" name="rating">
@@ -148,8 +158,7 @@ if (isset($_GET['logout'])) {
       </div>
     </div>
   </section>
-
-  <section class="ftco-section testimony-section bg-light">
+<section class="ftco-section testimony-section bg-light">
     <div class="container">
       <div class="row justify-content-center mb-5">
         <div class="col-md-7 text-center heading-section ftco-animate">
@@ -160,68 +169,40 @@ if (isset($_GET['logout'])) {
       <div class="row ftco-animate">
         <div class="col-md-12">
           <div class="carousel-testimony owl-carousel ftco-owl">
-            <div class="item">
+          <?php 
+                 if($result->num_rows > 0){
+                  // Output data for each row
+                    while($row = $result->fetch_assoc()){ 
+                      $name = $row['name'];
+                      $rating = $row['rate'];
+                      $message = $row['details'];
+                      $photo = $row['photo'];
+              ?>
+            <div class="item"> 
               <div class="testimony-wrap rounded text-center py-4 pb-5">
-                <div class="user-img mb-2" style="background-image: url(images/person_1.jpg)">
+                <div class="user-img mb-2" style="background-image: url('images/<?php echo $photo; ?>');">
                 </div>
                 <div class="text pt-4">
-                  <p class="mb-4">Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
-                  <p class="name">Roger Scott</p>
-                  <span class="position">Rating</span>
-                </div>
-              </div>
-            </div>
-            <div class="item">
-              <div class="testimony-wrap rounded text-center py-4 pb-5">
-                <div class="user-img mb-2" style="background-image: url(images/person_2.jpg)">
-                </div>
-                <div class="text pt-4">
-                  <p class="mb-4">Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
-                  <p class="name">Roger Scott</p>
-                  <span class="position">Rating</span>
-                </div>
-              </div>
-            </div>
-            <div class="item">
-              <div class="testimony-wrap rounded text-center py-4 pb-5">
-                <div class="user-img mb-2" style="background-image: url(images/person_3.jpg)">
-                </div>
-                <div class="text pt-4">
-                  <p class="mb-4">Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
-                  <p class="name">Roger Scott</p>
-                  <span class="position">Rating</span>
+                  <p class="mb-4"><?php echo $message; ?>.</p>
+                  <p class="name"><?php echo $name; ?></p>
+                  <span class="position"><?php echo $rating; ?> stars</span>
                 </div>
               </div>
               </div>
-            <div class="item">
-              <div class="testimony-wrap rounded text-center py-4 pb-5">
-                <div class="user-img mb-2" style="background-image: url(images/person_1.jpg)">
-                </div>
-                <div class="text pt-4">
-                  <p class="mb-4">Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
-                  <p class="name">Roger Scott</p>
-                  <span class="position">Rating</span>
-                </div>
-              </div>
-            </div>
-            <div class="item">
-              <div class="testimony-wrap rounded text-center py-4 pb-5">
-                <div class="user-img mb-2" style="background-image: url(images/person_1.jpg)">
-                </div>
-                <div class="text pt-4">
-                  <p class="mb-4">Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.</p>
-                  <p class="name">Roger Scott</p>
-                  <span class="position">Rating</span>
-                </div>
-              </div>
-            </div>
+            <?php 
+                    }
+                  }              
+               else {
+                  echo "No feedback available at the moment";
+                    }
+              ?>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <footer class="ftco-footer ftco-bg-dark ftco-section">
+<footer class="ftco-footer ftco-bg-dark ftco-section">
     <div class="container">
       <div class="row mb-5">
         <div class="col-md">
