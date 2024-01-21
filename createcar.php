@@ -26,7 +26,7 @@ $availability = isset($_POST['availability']) ? 1 : 0;
 $year_of_make = $_POST['year_of_make'];
 
 // Upload photo
-$targetDir = "images/";
+$targetDir = "./";
 $targetFilePath = $targetDir . basename($photo);
 
 // Move uploaded file and check for errors

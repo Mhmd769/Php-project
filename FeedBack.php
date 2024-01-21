@@ -1,28 +1,23 @@
 <?php
-// Start the session
-session_start();
+ session_start();
 require_once 'dbcon.php';
 
 // Check if the user is not logged in
 if (!isset($_SESSION['user_id'])) {
-    // Redirect to the login page or perform any other action
-    header("Location: Login.php");
+     header("Location: Login.php");
     exit();
 }
 
 $feedbackSubmitted = false;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Collect form data
-    $name = $_POST['name'];
+     $name = $_POST['name'];
     $rating = $_POST['rating'];
     $message = $_POST['message'];
     $photo = $_POST['photo'];
-    // Ensure the rating is an integer between 1 and 5
-    $rating = max(1, min($rating, 5));
+     $rating = max(1, min($rating, 5));
 
     $userId = $_SESSION['user_id'];
-    // Insert data into the feedback table
-    $sql = "INSERT INTO feedback (user_id, details, name, rate, photo) VALUES (?, ?, ?, ?, ?)";
+     $sql = "INSERT INTO feedback (user_id, details, name, rate, photo) VALUES (?, ?, ?, ?, ?)";
 
     $Feedback_stmt = $conn->prepare($sql);
     $Feedback_stmt->bind_param("issss", $userId, $message, $name, $rating, $photo);

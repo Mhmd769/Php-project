@@ -2,6 +2,7 @@
 
 session_start();
 require_once 'dbcon.php';
+
 // Logout Process
 if (isset($_GET['logout'])) {
     session_destroy();
@@ -16,16 +17,30 @@ if (!isset($_SESSION['email'])) {
     exit();
 }
 
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}   
-$sql = "SELECT * FROM cars";
-$result = $conn->query($sql);
+ // Check if the form is submitted for deleting a user
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user'])) {
+    $user_id = $_POST['delete_user'];
 
-$conn->close();
+    // Perform the delete operation
+    $delete_sql = "DELETE FROM feedback WHERE id = ?";
+    $delete_stmt = $conn->prepare($delete_sql);
+    $delete_stmt->bind_param("i", $user_id);  // Fix: Change $id to $user_id
+
+    if ($delete_stmt->execute()) {
+        echo "User deleted successfully.";
+    } else {
+        echo "Error deleting user: " . $delete_stmt->error;
+    }
+
+    $delete_stmt->close();
+}
+
+
+ $sql = "SELECT * FROM feedback";
+$result = $conn->query($sql);
 ?>
 
-
+<!-- HTML and Displaying User Data -->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -54,6 +69,37 @@ $conn->close();
     <link rel="stylesheet" href="css/flaticon.css">
     <link rel="stylesheet" href="css/icomoon.css">
     <link rel="stylesheet" href="css/style.css">
+
+
+
+    <head>
+    <!-- Other head elements -->
+
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            color:black;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        form {
+            display: inline;
+        }
+    </style>
   </head>
   <body>
   <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
@@ -84,73 +130,54 @@ $conn->close();
       <div class="container">
         <div class="row no-gutters slider-text js-fullheight align-items-end justify-content-start">
           <div class="col-md-9 ftco-animate pb-5">
-          	<p class="breadcrumbs"><span class="mr-2"><a href="index.php">Addcar <i class="ion-ios-arrow-forward"></i></a></span> <span>Records <i class="ion-ios-arrow-forward"></i></span></p>
+          	<p class="breadcrumbs"><span class="mr-2"><a href="index.php">Addcar <i class="ion-ios-arrow-forward"></i></a></span> <span>Car details <i class="ion-ios-arrow-forward"></i></span></p>
             <h1 class="mb-3 bread">Add Car</h1>
           </div>
         </div>
       </div>
     </section>
 
-    <div class="container mt-5">
-    <table class="table table-bordered">
-        <thead class="thead-dark">
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Mileage</th>
-                <th>Transmission</th>
-                <th>Seats</th>
-                <th>Luggage</th>
-                <th>Fuel</th>
-                <th>Description</th>
-                <th>Price</th>
-                <th>Availability</th>
-                <th>year</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php
-            // Check if there are records
-            if ($result->num_rows > 0) {
-                // Output data for each row
-                while ($row = $result->fetch_assoc()) {
-                    echo "<tr>";
-                    echo "<td class='text-center'>" . $row['id'] . "</td>";
-                    echo "<td class='text-center'>" . $row['name'] . "</td>";
-                    echo "<td class='text-center'>" . $row['mileage'] . "</td>";
-                    echo "<td class='text-center'>" . $row['transmission'] . "</td>";
-                    echo "<td class='text-center'>" . $row['seats'] . "</td>";
-                    echo "<td class='text-center'>" . $row['luggage'] . "</td>";
-                    echo "<td class='text-center'>" . $row['fuel'] . "</td>";
-                    echo "<td class='text-center'>" . $row['description'] . "</td>";
-                    echo "<td class='text-center'>$" . $row['price'] . "</td>";
-                    echo "<td class='text-center'>" . $row['availability'] . "</td>";
-                    echo "<td class='text-center'>" . $row['year_of_make'] . "</td>";
-                    // Add buttons for update and delete
-                    echo "<td class='text-center'>
-                    <form action='update_record.php' method='get' style='display:inline; margin-right:5px;'>
-                    <input type='hidden' name='car_id' value='" . $row['id'] . "'>
-                    <button type='submit' class='btn btn-primary btn-sm'>Update</button>
-                </form>
-                
-                            <form action='deletecar.php' method='post' style='display:inline;'>
-                              <input type='hidden' name='car_id' value='" . $row['id'] . "'>
-                              <button type='submit' class='btn btn-danger btn-sm'>Delete</button>
-                            </form>
-                          </td>";
-                    echo "</tr>";
-                }
-            } else {
-                echo "<tr><td colspan='10' class='text-center'>No records found</td></tr>";
-            }
-            ?>
-        </tbody>
-    </table>
-</div>
+	<section class="ftco-section">
+        <div class="container">
+            <div class="row justify-content-center">
+    <h2>List of feedbacks</h2>
 
-    	
-    <footer class="ftco-footer ftco-bg-dark ftco-section">
+    <?php
+    if ($result->num_rows > 0) {
+        echo "<table border='1'>
+                <tr>
+                    <th>Name</th>
+                    <th>details</th>
+                    <th>rate</th>
+                    <th>action</th>
+
+                </tr>";
+
+                while ($row = $result->fetch_assoc()) {
+                    echo "<tr>
+                            <td>{$row['name']}</td>
+                            <td>{$row['details']}</td>
+                            <td>{$row['rate']}</td>
+                            <td>
+                                <form action='' method='post'>
+                                    <input type='hidden' name='delete_user' value='{$row['id']}'>
+                                    <button  class='btn btn-danger py-2 mr-1' type='submit'>Delete</button>
+                                </form>
+                            </td>
+                        </tr>";
+                }
+        echo "</table>";
+    } else {
+        echo "No users found.";
+    }
+    ?>
+</div>
+</div>
+</section>
+</body>
+
+
+<footer class="ftco-footer ftco-bg-dark ftco-section">
 	<div class="container">
 	  <div class="row mb-5">
 		<div class="col-md">
@@ -224,4 +251,6 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
   <script src="js/main.js"></script>
     
   </body>
+</html>
+
 </html>

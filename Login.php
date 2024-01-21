@@ -8,8 +8,7 @@ if (isset($_GET['logout'])) {
     header("Location: Login.php");
 }
 
-// Login Process
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["login"])) {
+ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["login"])) {
     $email = $_POST["email"];
     $password = $_POST["password"];
 
@@ -24,7 +23,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["login"])) {
             $_SESSION["role"] = $row["role"];
 
             header("Location: index.php");
-            exit(); // Make sure to exit after redirecting
+            exit();  
         } else {
             echo '<script>alert("Invalid password");</script>';
         }

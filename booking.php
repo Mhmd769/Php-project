@@ -1,28 +1,23 @@
 <?php
 session_start();
 
-// Include your database connection code here
-require_once 'dbcon.php'; // Adjust the path as needed
+ require_once 'dbcon.php';  
 
 if (!isset($_SESSION['user_id'])) {
-    // Redirect to login page or handle accordingly
-    header("Location: login.php");
+     header("Location: login.php");
     exit();
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Retrieve and sanitize input data
-    $car_id = $_POST["car_id"];
+     $car_id = $_POST["car_id"];
     $car_name = $_POST["car_name"];
     $start_date = $_POST["start_date"];
     $end_date = $_POST["end_date"];
     $phone_number = $_POST["phone_number"];
 
-    // Calculate the number of days
-    $nb_of_days = (strtotime($end_date) - strtotime($start_date)) / (60 * 60 * 24);
+     $nb_of_days = (strtotime($end_date) - strtotime($start_date)) / (60 * 60 * 24);
 
-    // Retrieve car price from the database
-    $car_price_sql = "SELECT price FROM cars WHERE id = ?";
+     $car_price_sql = "SELECT price FROM cars WHERE id = ?";
     $car_price_stmt = $conn->prepare($car_price_sql);
     $car_price_stmt->bind_param("i", $car_id);
     $car_price_stmt->execute();
@@ -32,28 +27,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $car_row = $car_price_result->fetch_assoc();
         $car_price = $car_row["price"];
     
-        // Calculate total amount
-        $total_amount = $nb_of_days * $car_price;
+         $total_amount = $nb_of_days * $car_price;
     
-        // Get user ID from the session
-        $user_id = $_SESSION['user_id'];
+         $user_id = $_SESSION['user_id'];
     
-        // Save booking details to the database
-        $booking_sql = "INSERT INTO bookings (user_id, car_id, start_date, end_date, phone_number, number_of_days, total_payment, status) 
+         $booking_sql = "INSERT INTO bookings (user_id, car_id, start_date, end_date, phone_number, number_of_days, total_payment, status) 
         VALUES (?, ?, ?, ? , ?, ?, ?, 'unpaid')";
     
         $booking_stmt = $conn->prepare($booking_sql);
         $booking_stmt->bind_param("iissdsd", $user_id, $car_id, $start_date, $end_date, $phone_number, $nb_of_days, $total_amount);
     
         if ($booking_stmt->execute()) {
-            // Mark the car as not available
-            $update_car_sql = "UPDATE cars SET availability = 0 WHERE id = ?";
+             $update_car_sql = "UPDATE cars SET availability = 0 WHERE id = ?";
             $update_car_stmt = $conn->prepare($update_car_sql);
             $update_car_stmt->bind_param("i", $car_id);
             $update_car_stmt->execute();
     
-            // Redirect to the payment page with the booking_id parameter
-            $booking_id = $booking_stmt->insert_id;
+             $booking_id = $booking_stmt->insert_id;
             header("Location: payment.php?booking_id=$booking_id&success=1");
             exit();
         } else {
@@ -64,13 +54,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }    
 }
 
-// Retrieve car data for the form
-$cars_sql = "SELECT id, name FROM cars";
+ $cars_sql = "SELECT id, name FROM cars";
 $cars_result = $conn->query($cars_sql);
 
 ?>
-<!-- Rest of your HTML code -->
-
+  
 
 <!DOCTYPE html>
 <html lang="en">

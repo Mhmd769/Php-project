@@ -7,15 +7,13 @@ function hashPassword($password) {
     return password_hash($password, PASSWORD_BCRYPT);
 }
 
-// Insert Admin Process
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["register_admin"])) {
+ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["register_admin"])) {
     $adminName = $_POST["admin_name"];
     $adminEmail = $_POST["admin_email"];
     $adminPassword = hashPassword($_POST["admin_password"]);
     $adminRole = "admin"; // Assuming "admin" is the role for administrators
 
-    // Check if the email already exists
-    $checkEmailQuery = "SELECT * FROM users WHERE email = ?";
+     $checkEmailQuery = "SELECT * FROM users WHERE email = ?";
     $checkEmailStmt = $conn->prepare($checkEmailQuery);
 
     if (!$checkEmailStmt) {

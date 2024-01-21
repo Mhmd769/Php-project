@@ -60,6 +60,8 @@ if (!isset($_SESSION['email'])) {
 	        <ul class="navbar-nav ml-auto">
 	          <li class="nav-item active"><a href="Addcar.php" class="nav-link">Addcar</a></li>
 			  <li class="nav-item active"><a href="Records.php" class="nav-link">Records</a></li>
+			  <li class="nav-item active"><a href="userslist.php" class="nav-link">our Users</a></li>
+        <li class="nav-item active"><a href="feedbacklist.php" class="nav-link">our feedbacks</a></li>
 
 			  <?php if (isset($_SESSION['email'])) : ?>
               <li class="nav-item">

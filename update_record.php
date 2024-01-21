@@ -14,11 +14,11 @@ if (isset($_GET['car_id'])) {
         $row = $result->fetch_assoc();
     } else {
         echo "No car found with the provided ID.";
-        exit; // Stop execution if no car is found
+        exit; 
     }
 } else {
     echo "Car ID is not set.";
-    exit; // Stop execution if car_id is not set
+    exit; 
 }
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Check if the car_id is set
@@ -36,6 +36,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $price = $_POST['price'];
         $availability = isset($_POST['availability']) ? 1 : 0;
         $year_of_make = $_POST['year_of_make'];
+
+        
 
         // Check if a new photo is uploaded
         if (!empty($_FILES['photo']['name'])) {
