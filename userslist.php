@@ -1,5 +1,4 @@
 <?php
-
 session_start();
 require_once 'dbcon.php';
 
@@ -17,30 +16,41 @@ if (!isset($_SESSION['email'])) {
     exit();
 }
 
- // Check if the form is submitted for deleting a user
+// Check if the form is submitted for deleting a user
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user'])) {
     $user_id = $_POST['delete_user'];
 
-    // Perform the delete operation
-    $delete_sql = "DELETE FROM users WHERE id = ?";
-    $delete_stmt = $conn->prepare($delete_sql);
-    $delete_stmt->bind_param("i", $user_id);  // Fix: Change $id to $user_id
+    $delete_booking_sql = "DELETE FROM bookings WHERE user_id = ?";
+    $delete_booking_stmt = $conn->prepare($delete_booking_sql);
+    $delete_booking_stmt->bind_param("i", $user_id);
 
-    if ($delete_stmt->execute()) {
-        echo "User deleted successfully.";
-    } else {
-        echo "Error deleting user: " . $delete_stmt->error;
+    // Execute the booking deletion
+    if (!$delete_booking_stmt->execute()) {
+        echo "Error deleting associated bookings: " . $delete_booking_stmt->error;
+        exit();
     }
 
-    $delete_stmt->close();
-}
+    // Now, delete the user
+    $delete_user_sql = "DELETE FROM users WHERE id = ?";
+    $delete_user_stmt = $conn->prepare($delete_user_sql);
+    $delete_user_stmt->bind_param("i", $user_id);
 
+    // Execute the user deletion
+    if ($delete_user_stmt->execute()) {
+        echo "User and associated records deleted successfully.";
+    } else {
+        echo "Error deleting user: " . $delete_user_stmt->error;
+    }
+
+    // Close statements
+    $delete_booking_stmt->close();
+    $delete_user_stmt->close();
+}
 
 // Fetch users
 $sql = "SELECT * FROM users WHERE role = 'user'";
 $result = $conn->query($sql);
 ?>
-
 <!-- HTML and Displaying User Data -->
 <!DOCTYPE html>
 <html lang="en">
@@ -115,7 +125,8 @@ $result = $conn->query($sql);
 	          <li class="nav-item active"><a href="Addcar.php" class="nav-link">Addcar</a></li>
 			  <li class="nav-item active"><a href="Records.php" class="nav-link">Records</a></li>
 			  <li class="nav-item active"><a href="userslist.php" class="nav-link">our Users</a></li>
-        <li class="nav-item active"><a href="feedbacklist.php" class="nav-link">our feedbacks</a></li>
+        <li class="nav-item active"><a href="feedbacklist.php" class="nav-link">Lists
+        </a></li>
 
 			  <?php if (isset($_SESSION['email'])) : ?>
               <li class="nav-item">

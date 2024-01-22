@@ -1,5 +1,4 @@
 <?php
-
 session_start();
 require_once 'dbcon.php';
 
@@ -17,14 +16,14 @@ if (!isset($_SESSION['email'])) {
     exit();
 }
 
- // Check if the form is submitted for deleting a user
+// Check if the form is submitted for deleting a user
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user'])) {
     $user_id = $_POST['delete_user'];
 
     // Perform the delete operation
     $delete_sql = "DELETE FROM feedback WHERE id = ?";
     $delete_stmt = $conn->prepare($delete_sql);
-    $delete_stmt->bind_param("i", $user_id);  // Fix: Change $id to $user_id
+    $delete_stmt->bind_param("i", $user_id);
 
     if ($delete_stmt->execute()) {
         echo "User deleted successfully.";
@@ -33,14 +32,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user'])) {
     }
 
     $delete_stmt->close();
+  }
+
+
+$sql = "SELECT * FROM feedback";
+$result = $conn->query($sql);
+
+// Retrieve user's bookings
+$booking_sql = "SELECT b.car_id, c.name, b.start_date, b.end_date, b.number_of_days, b.status, b.total_payment
+                FROM bookings b 
+                JOIN cars c ON b.car_id = c.id";
+$booking_result = $conn->query($booking_sql);
+
+// Check if the form is submitted for deleting a booking
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_booking'])) {
+  $booking_id = $_POST['delete_booking'];
+
+  // Perform the delete operation
+  $delete_booking_sql = "DELETE FROM bookings WHERE booking_id = ?";
+  $delete_booking_stmt = $conn->prepare($delete_booking_sql);
+  $delete_booking_stmt->bind_param("i", $booking_id);
+
+  if ($delete_booking_stmt->execute()) {
+      echo "Booking deleted successfully.";
+  } else {
+      echo "Error deleting booking: " . $delete_booking_stmt->error;
+  }
+
+  $delete_booking_stmt->close();
 }
 
-
- $sql = "SELECT * FROM feedback";
-$result = $conn->query($sql);
+$conn->close();
 ?>
 
-<!-- HTML and Displaying User Data -->
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -110,11 +135,12 @@ $result = $conn->query($sql);
 	      </button>
 
 	      <div class="collapse navbar-collapse" id="ftco-nav">
-	        <ul class="navbar-nav ml-auto">
+        <ul class="navbar-nav ml-auto">
 	          <li class="nav-item active"><a href="Addcar.php" class="nav-link">Addcar</a></li>
 			  <li class="nav-item active"><a href="Records.php" class="nav-link">Records</a></li>
 			  <li class="nav-item active"><a href="userslist.php" class="nav-link">our Users</a></li>
-        <li class="nav-item active"><a href="feedbacklist.php" class="nav-link">our feedbacks</a></li>
+        <li class="nav-item active"><a href="feedbacklist.php" class="nav-link">Lists
+        </a></li>
 
 			  <?php if (isset($_SESSION['email'])) : ?>
               <li class="nav-item">
@@ -174,6 +200,46 @@ $result = $conn->query($sql);
 </div>
 </div>
 </section>
+<!-- Bookings table -->
+<div class="container mt-5">
+    <h2 class="row justify-content-center">My Bookings</h2>
+    <table class="table table-bordered">
+        <thead class="thead-dark">
+            <tr>
+                <th>Booking ID</th>
+                <th>Car Name</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Number of days</th>
+                <th>Status</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+            // Check if there are records
+            if ($booking_result->num_rows > 0) {
+                // Output data for each row
+                while ($row = $booking_result->fetch_assoc()) {
+                    echo "<tr>";
+                    echo "<td class='text-center'>" . $row['car_id'] . "</td>";
+                    echo "<td class='text-center'>" . $row['name'] . "</td>";
+                    echo "<td class='text-center'>" . $row['start_date'] . "</td>";
+                    echo "<td class='text-center'>" . $row['end_date'] . "</td>";
+                    echo "<td class='text-center'>" . $row['number_of_days'] . "</td>";
+                    echo "<td class='text-center'>" . $row['status'] . "</td>";
+                    echo "<td class='text-center'>" . $row['total_payment'] . "</td>";
+                
+                }
+            } else {
+                echo "<tr><td colspan='8' class='text-center'>No records found</td></tr>";
+            }
+            ?>
+        </tbody>
+    </table>
+</div>
+
+
 </body>
 
 

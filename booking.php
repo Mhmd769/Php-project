@@ -38,7 +38,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $booking_stmt->bind_param("iissdsd", $user_id, $car_id, $start_date, $end_date, $phone_number, $nb_of_days, $total_amount);
     
         if ($booking_stmt->execute()) {
-             $update_car_sql = "UPDATE cars SET availability = 0 WHERE id = ?";
+            $update_car_sql = "UPDATE cars SET availability = 0 WHERE id = ?";
             $update_car_stmt = $conn->prepare($update_car_sql);
             $update_car_stmt->bind_param("i", $car_id);
             $update_car_stmt->execute();
