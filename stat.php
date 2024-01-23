@@ -51,6 +51,10 @@ var myPieChart = new Chart(ctx, {
                 'rgba(255, 206, 8, 0.7)',
                 'rgba(255, 20, 86, 0.7)',
                 'rgba(25, 206, 86, 7)',
+                'rgba(255, 20, 8, 0.7)',
+                'rgba(25, 20, 86, 7)',
+                'rgba(25, 20, 86, 0.7)',
+                'rgba(25, 26, 86, 23)',
 
                 // Add more colors as needed
             ],

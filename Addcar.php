@@ -127,9 +127,10 @@ if (!isset($_SESSION['email'])) {
                             <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
                         </div>
                         <div class="form-group">
-                        <label for="photo">Car Photo</label>
-                        <input type="file" class="form-control" id="photo" name="photo" accept="image/*">
-                    </div>
+                            <label for="photo">Car Photo</label>
+                            <input type="file" class="form-control" id="photo" name="photo" accept="image/*">
+                        </div>
+
 
                     <div class="form-group">
                         <label for="availability">Availability</label>

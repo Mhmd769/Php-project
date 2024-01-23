@@ -137,9 +137,9 @@ $conn->close();
 	      <div class="collapse navbar-collapse" id="ftco-nav">
         <ul class="navbar-nav ml-auto">
 	          <li class="nav-item active"><a href="Addcar.php" class="nav-link">Addcar</a></li>
-			  <li class="nav-item active"><a href="Records.php" class="nav-link">Records</a></li>
-			  <li class="nav-item active"><a href="userslist.php" class="nav-link">our Users</a></li>
-        <li class="nav-item active"><a href="feedbacklist.php" class="nav-link">Lists
+			  <li class="nav-item "><a href="Records.php" class="nav-link">Records</a></li>
+			  <li class="nav-item "><a href="userslist.php" class="nav-link">our Users</a></li>
+        <li class="nav-item "><a href="feedbacklist.php" class="nav-link">Lists
         </a></li>
 
 			  <?php if (isset($_SESSION['email'])) : ?>

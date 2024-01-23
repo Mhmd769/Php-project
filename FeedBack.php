@@ -83,6 +83,36 @@ if (isset($_GET['logout'])) {
       };
     </script>
   <?php endif; ?>
+
+
+
+  <style>
+    .feedback-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  color:black;
+}
+
+.feedback-table th, .feedback-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.user-img {
+  width: 50px;
+  height: 50px;
+  background-size: cover;
+  background-position: center;
+  border-radius: 50%;
+}
+
+.rating {
+  font-weight: bold;
+}
+
+  </style>
 </head>
 
 <body>
@@ -95,9 +125,10 @@ if (isset($_GET['logout'])) {
       </button>
       <div class="collapse navbar-collapse" id="ftco-nav">
         <ul class="navbar-nav ml-auto">
-          <li class="nav-item"><a href="index.php" class="nav-link">Home</a></li>
-          <li class="nav-item"><a href="car.php" class="nav-link">Cars</a></li>
-          <li class="nav-item active"><a href="FeedBack.php" class="nav-link">FeedBacks</a></li>
+        <li class="nav-item active"><a href="index.php" class="nav-link">Home</a></li>
+	          <li class="nav-item"><a href="car.php" class="nav-link">Cars</a></li>
+            <li class="nav-item"><a href="stat.php" class="nav-link">stat</a></li>
+	          <li class="nav-item"><a href="FeedBack.php" class="nav-link">FeedBack</a></li>
           <?php if (isset($_SESSION['email'])) : ?>
             <li class="nav-item">
               <a class="nav-link" href="?logout">Logout</a>
@@ -162,39 +193,47 @@ if (isset($_GET['logout'])) {
         </div>
       </div>
       <div class="row ftco-animate">
-        <div class="col-md-12">
-          <div class="carousel-testimony owl-carousel ftco-owl">
-          <?php 
-                 if($result->num_rows > 0){
-                  // Output data for each row
-                    while($row = $result->fetch_assoc()){ 
-                      $name = $row['name'];
-                      $rating = $row['rate'];
-                      $message = $row['details'];
-                      $photo = $row['photo'];
-              ?>
-            <div class="item"> 
-              <div class="testimony-wrap rounded text-center py-4 pb-5">
-                <div class="user-img mb-2" style="background-image: url('images/<?php echo $photo; ?>');">
-                </div>
-                <div class="text pt-4">
-                  <p class="mb-4"><?php echo $message; ?>.</p>
-                  <p class="name"><?php echo $name; ?></p>
-                  <span class="position"><?php echo $rating; ?> stars</span>
-                </div>
-              </div>
-              </div>
-            <?php 
-                    }
-                  }              
-               else {
-                  echo "No feedback available at the moment";
-                    }
-              ?>
-          </div>
-        </div>
-      </div>
-    </div>
+  <div class="col-md-12">
+    <table class="feedback-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Message</th>
+          <th>Rating</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php 
+        if ($result->num_rows > 0) {
+          // Output data for each row
+          while ($row = $result->fetch_assoc()) { 
+            $name = $row['name'];
+            $rating = $row['rate'];
+            $message = $row['details'];
+        ?>
+          <tr>
+            <td >
+            <p class="name"><?php echo $name; ?></p>
+
+            </td>
+            <td class="text">
+              <p class="mb-4"><?php echo $message; ?></p>
+            </td>
+            <td class="rating">
+              <span><?php echo $rating; ?> stars</span>
+            </td>
+          </tr>
+        <?php 
+          }
+        } else {
+          echo '<tr><td colspan="3">No feedback available at the moment</td></tr>';
+        }
+        ?>
+      </tbody>
+    </table>
+  </div>
+</div>
+
   </section>
 
 <footer class="ftco-footer ftco-bg-dark ftco-section">

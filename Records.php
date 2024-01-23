@@ -114,38 +114,48 @@ $conn->close();
             <?php
             // Check if there are records
             if ($result->num_rows > 0) {
-                // Output data for each row
-                while ($row = $result->fetch_assoc()) {
-                    echo "<tr>";
-                    echo "<td class='text-center'>" . $row['id'] . "</td>";
-                    echo "<td class='text-center'>" . $row['name'] . "</td>";
-                    echo "<td class='text-center'>" . $row['mileage'] . "</td>";
-                    echo "<td class='text-center'>" . $row['transmission'] . "</td>";
-                    echo "<td class='text-center'>" . $row['seats'] . "</td>";
-                    echo "<td class='text-center'>" . $row['luggage'] . "</td>";
-                    echo "<td class='text-center'>" . $row['fuel'] . "</td>";
-                    echo "<td class='text-center'>" . $row['description'] . "</td>";
-                    echo "<td class='text-center'>$" . $row['price'] . "</td>";
-                    echo "<td class='text-center'>" . $row['availability'] . "</td>";
-                    echo "<td class='text-center'>" . $row['year_of_make'] . "</td>";
-                    // Add buttons for update and delete
-                    echo "<td class='text-center'>
-                    <form action='update_record.php' method='get' style='display:inline; margin-right:5px;'>
-                    <input type='hidden' name='car_id' value='" . $row['id'] . "'>
-                    <button type='submit' class='btn btn-primary btn-sm'>Update</button>
-                </form>
-                
-                            <form action='deletecar.php' method='post' style='display:inline;'>
+              // Output data for each row
+              while ($row = $result->fetch_assoc()) {
+                  echo "<tr>";
+                  echo "<td class='text-center'>" . $row['id'] . "</td>";
+                  echo "<td class='text-center'>" . $row['name'] . "</td>";
+                  echo "<td class='text-center'>" . $row['mileage'] . "</td>";
+                  echo "<td class='text-center'>" . $row['transmission'] . "</td>";
+                  echo "<td class='text-center'>" . $row['seats'] . "</td>";
+                  echo "<td class='text-center'>" . $row['luggage'] . "</td>";
+                  echo "<td class='text-center'>" . $row['fuel'] . "</td>";
+                  echo "<td class='text-center'>" . $row['description'] . "</td>";
+                  echo "<td class='text-center'>$" . $row['price'] . "</td>";
+                  echo "<td class='text-center'>" . $row['availability'] . "</td>";
+                  echo "<td class='text-center'>" . $row['year_of_make'] . "</td>";
+          
+                  // Add buttons for update and delete
+                  echo "<td class='text-center'>";
+                  
+                  if ($row['availability'] == 1) {
+                      echo "<form action='update_record.php' method='get' style='display:inline; margin-right:5px;'>
+                              <input type='hidden' name='car_id' value='" . $row['id'] . "'>
+                              <button type='submit' class='btn btn-primary btn-sm'>Update</button>
+                          </form>";
+          
+                      echo "<form action='deletecar.php' method='post' style='display:inline;'>
                               <input type='hidden' name='car_id' value='" . $row['id'] . "'>
                               <button type='submit' class='btn btn-danger btn-sm'>Delete</button>
-                            </form>
-                          </td>";
-                    echo "</tr>";
-                }
-            } else {
-                echo "<tr><td colspan='10' class='text-center'>No records found</td></tr>";
-            }
-            ?>
+                          </form>";
+                  } else {
+                      // Car is booked, disable both buttons
+                      echo "<button class='btn btn-primary btn-sm' disabled>Update</button>";
+                      echo "<button class='btn btn-danger btn-sm' disabled>Delete</button>";
+                  }
+          
+                  echo "</td>";
+                  echo "</tr>";
+              }
+          } else {
+              echo "<tr><td colspan='11' class='text-center'>No records found</td></tr>";
+          }
+          ?>
+          
         </tbody>
     </table>
 </div>
