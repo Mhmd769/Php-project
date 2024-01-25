@@ -2,25 +2,26 @@
 session_start();
 require_once 'dbcon.php';
 
-// Logout Process
 if (isset($_GET['logout'])) {
     session_destroy();
     header("Location: AdminLogin.php");
     exit();
 }
 
-// Check if the user is logged in
 if (!isset($_SESSION['email'])) {
-    // Redirect to the login page or perform any other action
     header("Location: AdminLogin.php");
     exit();
 }
 
-// Check if the form is submitted for deleting a user
+
+if ($_SESSION['role'] !== 'admin') {
+  header("Location: login.php");
+  exit();
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user'])) {
     $user_id = $_POST['delete_user'];
 
-    // Perform the delete operation
     $delete_sql = "DELETE FROM feedback WHERE id = ?";
     $delete_stmt = $conn->prepare($delete_sql);
     $delete_stmt->bind_param("i", $user_id);
@@ -38,17 +39,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user'])) {
 $sql = "SELECT * FROM feedback";
 $result = $conn->query($sql);
 
-// Retrieve user's bookings
 $booking_sql = "SELECT b.car_id, c.name, b.start_date, b.end_date, b.number_of_days, b.status, b.total_payment
                 FROM bookings b 
                 JOIN cars c ON b.car_id = c.id";
 $booking_result = $conn->query($booking_sql);
 
-// Check if the form is submitted for deleting a booking
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_booking'])) {
   $booking_id = $_POST['delete_booking'];
 
-  // Perform the delete operation
   $delete_booking_sql = "DELETE FROM bookings WHERE booking_id = ?";
   $delete_booking_stmt = $conn->prepare($delete_booking_sql);
   $delete_booking_stmt->bind_param("i", $booking_id);

@@ -2,7 +2,6 @@
 session_start();
 require_once 'dbcon.php';
 
-// Function to hash passwords (use this when registering a new admin)
 function hashPassword($password) {
     return password_hash($password, PASSWORD_BCRYPT);
 }
@@ -38,11 +37,9 @@ function hashPassword($password) {
         $insertAdminStmt->bind_param("ssss", $adminName, $adminEmail, $adminPassword, $adminRole);
 
         if ($insertAdminStmt->execute()) {
-            // Log in the newly registered admin
             $_SESSION["email"] = $adminEmail;
             $_SESSION["role"] = $adminRole;
 
-            // Redirect to a welcome or dashboard page
             echo '<script>alert("Admin user successfully registered and logged in!");</script>';
             echo '<script>window.location.href = "Addcar.php";</script>';
             exit();

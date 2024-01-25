@@ -2,6 +2,19 @@
 session_start();
 require_once 'dbcon.php';
 
+if (!isset($_SESSION['email'])) {
+    // Redirect to the login page
+    header("Location: AdminLogin.php");
+    exit();
+}
+
+if ($_SESSION['role'] !== 'admin') {
+  // Redirect to the login page
+  header("Location: login.php");
+  exit();
+}
+
+
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }   
@@ -66,7 +79,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 WHERE id = $carId";
 
         if ($conn->query($sql) === TRUE) {
-            echo "Car record updated successfully";
+            echo '<script>alert("Car record updated successfully");</script>';
+
             header("Location: Records.php");
 
         } else {

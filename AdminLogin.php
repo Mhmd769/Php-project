@@ -25,18 +25,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["login"])) {
             $_SESSION["role"] = $row["role"];
 
             if ($_SESSION["role"] == "admin") {
-                // Redirect the admin to the Add Car page
                 header("Location: addcar.php");
             } else {
-                // Redirect to the user dashboard or any regular user page
                 echo '<script>alert("You do not have permission to access this page. Please log in as a user.");</script>';
 
-                // Redirect to the user login page
                 echo '<script>window.location.href = "Login.php";</script>';
                 exit();
             }
 
-            exit(); // Make sure to exit after redirecting
+            exit(); 
         } else {
             echo '<script>alert("Invalid password");</script>';
         }

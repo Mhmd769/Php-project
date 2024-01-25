@@ -38,7 +38,8 @@ if (isset($_GET['booking_id'])) {
             $payment_stmt->execute();
 
             if ($payment_stmt->affected_rows > 0) {
-                echo "Payment successful. Thank you!";
+                echo '<script>alert("Payment successful. Thank you!");</script>';
+
 
                 // Redirect to the home page after a successful payment
                 header("Location: index.php");  // Adjust the path as needed

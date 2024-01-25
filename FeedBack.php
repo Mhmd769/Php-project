@@ -24,7 +24,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($Feedback_stmt->execute()) {
         $feedbackSubmitted = true;
-    } else {
+        echo '<script>alert("feedback sent successfully");</script>';
+      } else {
         echo "Error: " . $Feedback_stmt->error;
     }
 
@@ -129,6 +130,7 @@ if (isset($_GET['logout'])) {
 	          <li class="nav-item"><a href="car.php" class="nav-link">Cars</a></li>
             <li class="nav-item"><a href="stat.php" class="nav-link">stat</a></li>
 	          <li class="nav-item"><a href="FeedBack.php" class="nav-link">FeedBack</a></li>
+            <li class="nav-item"><a href="usersrecords.php" class="nav-link">Records</a></li>
           <?php if (isset($_SESSION['email'])) : ?>
             <li class="nav-item">
               <a class="nav-link" href="?logout">Logout</a>

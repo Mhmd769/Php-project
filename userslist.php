@@ -11,43 +11,49 @@ if (isset($_GET['logout'])) {
 
 // Check if the user is logged in
 if (!isset($_SESSION['email'])) {
-    // Redirect to the login page or perform any other action
     header("Location: AdminLogin.php");
     exit();
+}
+
+if ($_SESSION['role'] !== 'admin') {
+  // Redirect to the login page or perform any other action
+  header("Location: login.php");
+  exit();
 }
 
 // Check if the form is submitted for deleting a user
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user'])) {
     $user_id = $_POST['delete_user'];
 
+
+    $delete_feedback_sql = "DELETE FROM feedback WHERE user_id = ?";
+    $delete_feedback_stmt = $conn->prepare($delete_feedback_sql);
+    $delete_feedback_stmt->bind_param("i", $user_id);
+
     $delete_booking_sql = "DELETE FROM bookings WHERE user_id = ?";
     $delete_booking_stmt = $conn->prepare($delete_booking_sql);
     $delete_booking_stmt->bind_param("i", $user_id);
 
-    // Execute the booking deletion
     if (!$delete_booking_stmt->execute()) {
         echo "Error deleting associated bookings: " . $delete_booking_stmt->error;
         exit();
     }
 
-    // Now, delete the user
     $delete_user_sql = "DELETE FROM users WHERE id = ?";
     $delete_user_stmt = $conn->prepare($delete_user_sql);
     $delete_user_stmt->bind_param("i", $user_id);
 
-    // Execute the user deletion
     if ($delete_user_stmt->execute()) {
-        echo "User and associated records deleted successfully.";
+        echo '<script>alert("User and associated records deleted successfully.);</script>';
+
     } else {
         echo "Error deleting user: " . $delete_user_stmt->error;
     }
 
-    // Close statements
     $delete_booking_stmt->close();
     $delete_user_stmt->close();
 }
 
-// Fetch users
 $sql = "SELECT * FROM users WHERE role = 'user'";
 $result = $conn->query($sql);
 ?>

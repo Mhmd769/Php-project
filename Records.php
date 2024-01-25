@@ -9,11 +9,10 @@ if (isset($_GET['logout'])) {
     exit();
 }
 
-// Check if the user is logged in
-if (!isset($_SESSION['email'])) {
-    // Redirect to the login page or perform any other action
-    header("Location: AdminLogin.php");
-    exit();
+if (!isset($_SESSION['email']) || $_SESSION['role'] !== 'admin') {
+  // Redirect to the login page or perform any other action
+  header("Location: AdminLogin.php");
+  exit();
 }
 
 if ($conn->connect_error) {
